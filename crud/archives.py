@@ -22,6 +22,13 @@ def queryArchiveList():
             "time_for_read": result.time_for_read,
             "title": result.title,
             "update_time": toTimeStamp(result.update_time),
-            "views": result.views
+            "views": result.views,
+            "tags": tags
         })
-    return data
+    return {"data": data}
+
+
+def queryArchive(archId):
+    query = t_archives.query.filter_by(id).first()
+    print(query)
+    return {'data': query}

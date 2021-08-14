@@ -1,4 +1,4 @@
-from flask import json, request, make_response
+from flask import json, request
 from . import authAPI
 
 from utils.response import json_res
