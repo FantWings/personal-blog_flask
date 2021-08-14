@@ -1,8 +1,8 @@
-from flask import Blueprint, request, make_response
+from flask import json, request, make_response
 from . import authAPI
 
 from utils.response import json_res
-from crud.users import registerNewAccount, sendCodeByEmail
+from crud.users import registerNewAccount, sendCodeByEmail, activeAccount
 
 print('[INFO] Blueprint - authAPI Loaded.')
 
@@ -12,23 +12,34 @@ def register():
     submit = request.get_json()
     username = submit.get('username')
     passwd = submit.get('passwd')
-    registerNewAccount(username, passwd)
-    return make_response(json_res(msg="注册成功"), 200)
+    result = registerNewAccount(username, passwd)
+    return json_res(**result)
 
 
-@auth.route('/sendVerfiyCode', methods=['GET'])
+@authAPI.route('/sendVerfiyCode', methods=['GET'])
 def sendVerfiyCode():
     token = request.headers.get('token', default=0)
     method = request.args.get('method')
-    
-    if method = 'phone':
-        return make_response(json_res(msg="方法暂未开放",status=1),200)
-    if method = 'email':
+
+    if method is 'sms':
+        return json_res(msg="方法暂未开放", status=1)
+    if method is 'email':
         email = request.args.get('value')
-        FcStatus = sendCodeByEmail(token,email)
-        if FcStatus != 0 :
-            return make_response(json_res(msg=FcStatus,status=1),200)
-        return make_response(json_res(msg="邮件发送成功"),200)
+        result = sendCodeByEmail(token, email)
+        return json_res(**result)
+
+
+@authAPI.route('/verifyAccount', method=['POST'])
+def verifyAccount():
+    token = request.headers.get('token', default=0)
+    method = request.args.get('method')
+    body = request.get_json()
+
+    if method is 'sms':
+        return json_res(msg="方法暂未开放", status=1)
+    if method is 'email':
+        result = activeAccount(token, body.verifyCode)
+        return json_res(**result)
 
 
 # @authAPI.route('/login', methods=['POST'])
