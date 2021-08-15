@@ -7,6 +7,9 @@ from email.mime.text import MIMEText
 # from email.mime.application import MIMEApplication
 from email.header import Header
 from flask import current_app
+from utils.log import log
+
+log('Useing SMTP Library [Ver 1.1]')
 
 
 def sendmail(body, sendto, subject, sender, replyto=''):

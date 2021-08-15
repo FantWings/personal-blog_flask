@@ -1,5 +1,8 @@
 import redis
 from flask import current_app
+from utils.log import log
+
+log('Loaded Redis Library [Ver 1.2]')
 
 
 class Redis(object):

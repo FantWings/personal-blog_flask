@@ -6,7 +6,7 @@ from utils.log import log
 from utils.response import json_res
 from crud.users import registerNewAccount, sendCodeByEmail, activeAccount
 
-log('Blueprint - authAPI Loaded.')
+log('Loaded AuthAPI. [Ver 1.2]')
 
 
 @authAPI.route('/register', methods=['POST'])

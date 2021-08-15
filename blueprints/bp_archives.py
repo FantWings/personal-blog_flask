@@ -5,7 +5,7 @@ from utils.log import log
 from utils.response import json_res
 from crud.archives import queryArchiveList, queryArchive
 
-log('Blueprint - archiveAPI Loaded.')
+log('Loaded ArchiveAPI [Ver 1.1]')
 
 
 @archiveAPI.route('/getArchivesList', methods=["GET"])
