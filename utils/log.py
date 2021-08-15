@@ -2,7 +2,7 @@ import time
 from os import getenv
 
 
-def log(content, level='info'):
+def log(content, level="info"):
     # methods = {
     #     "defualt": 0,
     #     "high_light": 1,
@@ -30,10 +30,10 @@ def log(content, level='info'):
         "nolog": 4,
     }
 
-    if logLevels[getenv('LOG_LEVEL', default='error')] > logLevels[level]:
+    if logLevels[getenv("LOG_LEVEL", default="error")] > logLevels[level]:
         return None
 
-    fontColor = {"info": 2, "warn": 3, "error": 1, 'debug': 5}
+    fontColor = {"info": 2, "warn": 3, "error": 1, "debug": 5}
     template = {
         "time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
         "loglevel": level.upper(),
@@ -43,5 +43,7 @@ def log(content, level='info'):
     }
 
     print(
-        "\033[{printMethod};3{fontColor}m[{time}][{loglevel}] {content}\033[0m"
-        .format(**template))
+        "\033[{printMethod};3{fontColor}m[{time}][{loglevel}] {content}\033[0m".format(
+            **template
+        )
+    )

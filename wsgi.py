@@ -23,10 +23,10 @@ class StandaloneApplication(gunicorn.app.base.BaseApplication):
         return self.application
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     options = {
-        'bind': '0.0.0.0:9090',
-        'preload': True,
-        'workers': 3,
+        "bind": "0.0.0.0:9090",
+        "preload": True,
+        "workers": 3,
     }
     StandaloneApplication(app, options).run()

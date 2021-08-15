@@ -2,15 +2,15 @@ import redis
 from flask import current_app
 from utils.log import log
 
-log('Loaded Redis Library [Ver 1.2]')
+log("Loaded Redis Library [Ver 1.2]")
 
 
 class Redis(object):
     @staticmethod
     def _get_r():
-        host = current_app.config['REDIS_HOST']
-        port = current_app.config['REDIS_PORT']
-        db = current_app.config['REDIS_DB']
+        host = current_app.config["REDIS_HOST"]
+        port = current_app.config["REDIS_PORT"]
+        db = current_app.config["REDIS_DB"]
         r = redis.StrictRedis(host, port, db)
         return r
 
@@ -19,7 +19,7 @@ class Redis(object):
         if expire:
             expire_in_seconds = expire
         else:
-            expire_in_seconds = current_app.config['REDIS_EXPIRE']
+            expire_in_seconds = current_app.config["REDIS_EXPIRE"]
         r = cls._get_r()
         r.set(key, value, ex=expire_in_seconds)
 
@@ -27,7 +27,7 @@ class Redis(object):
     def read(cls, key):
         r = cls._get_r()
         value = r.get(key)
-        return value.decode('utf-8') if value else value
+        return value.decode("utf-8") if value else value
 
     @classmethod
     def hset(cls, name, key, value):
@@ -44,7 +44,7 @@ class Redis(object):
     def hget(cls, name, key):
         r = cls._get_r()
         value = r.hget(name, key)
-        return value.decode('utf-8') if value else value
+        return value.decode("utf-8") if value else value
 
     @classmethod
     def hgetall(cls, name):
@@ -66,6 +66,6 @@ class Redis(object):
         if expire:
             expire_in_seconds = expire
         else:
-            expire_in_seconds = current_app.config['REDIS_EXPIRE']
+            expire_in_seconds = current_app.config["REDIS_EXPIRE"]
         r = cls._get_r()
         r.expire(name, expire_in_seconds)

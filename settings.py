@@ -7,9 +7,12 @@ from utils.log import log
 class Config(object):
     # SQLALCHEMY配置
     SQLALCHEMY_DATABASE_URI = "mysql://{}:{}@{}:{}/{}".format(
-        os.getenv('SQL_USER', 'root'), os.getenv('SQL_PASS', None),
-        os.getenv('SQL_HOST', '127.0.0.1'), os.getenv('SQL_PORT', 3306),
-        os.getenv('SQL_BASE', 'blog'))
+        os.getenv("SQL_USER", "root"),
+        os.getenv("SQL_PASS", None),
+        os.getenv("SQL_HOST", "127.0.0.1"),
+        os.getenv("SQL_PORT", 3306),
+        os.getenv("SQL_BASE", "blog"),
+    )
 
     log(
         """
@@ -22,8 +25,10 @@ class Config(object):
     (sql, password, userinfo , or your top secret etc.)
     DO NOT USE DEBUG MODE IN PRODUCTION ENV!
     if you do this, used your own RISK!
-    """, 'warn')
-    log('SQL_URI is: {}'.format(SQLALCHEMY_DATABASE_URI), 'debug')
+    """,
+        "warn",
+    )
+    log("SQL_URI is: {}".format(SQLALCHEMY_DATABASE_URI), "debug")
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -37,4 +42,4 @@ class Config(object):
     PERMANENT_SESSION_LIFETIME = timedelta(days=31)
 
     # 开启SQLALCHEMY哆嗦模式
-    SQLALCHEMY_ECHO = os.getenv('SQL_ECHO', False)
+    SQLALCHEMY_ECHO = os.getenv("SQL_ECHO", False)

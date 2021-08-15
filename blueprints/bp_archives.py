@@ -5,10 +5,10 @@ from utils.log import log
 from utils.response import json_res
 from crud.archives import queryArchiveList, queryArchive
 
-log('Loaded ArchiveAPI [Ver 1.1]')
+log("Loaded ArchiveAPI [Ver 1.1]")
 
 
-@archiveAPI.route('/getArchivesList', methods=["GET"])
+@archiveAPI.route("/getArchivesList", methods=["GET"])
 def getArchivesList():
     """
     获取博客列表
@@ -17,15 +17,15 @@ def getArchivesList():
     return json_res(**result)
 
 
-@archiveAPI.route('/getArchivesTags', methods=["GET"])
+@archiveAPI.route("/getArchivesTags", methods=["GET"])
 def getArchivesTags():
     """
     获取标签列表
     """
-    return json_res(data=['test', 'test2'])
+    return json_res(data=["test", "test2"])
 
 
-@archiveAPI.route('/getArchivesDetail/<archId>', methods=['GET'])
+@archiveAPI.route("/getArchivesDetail/<archId>", methods=["GET"])
 def getArchivesDetail(archId):
     """
     获取文章内容
