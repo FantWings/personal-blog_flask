@@ -1,4 +1,3 @@
-from logging import debug
 from flask import request
 from . import authAPI
 from utils.log import log
@@ -25,9 +24,9 @@ def sendVerfiyCode():
     token = request.headers.get('token', default=0)
     method = request.args.get('method')
 
-    if method is 'sms':
+    if method == 'sms':
         return json_res(msg="方法暂未开放", status=1)
-    if method is 'email':
+    if method == 'email':
         email = request.args.get('value')
         result = sendCodeByEmail(token, email)
         return json_res(**result)
@@ -39,9 +38,9 @@ def verifyAccount():
     method = request.args.get('method')
     body = request.get_json()
 
-    if method is 'sms':
+    if method == 'sms':
         return json_res(msg="方法暂未开放", status=1)
-    if method is 'email':
+    if method == 'email':
         result = activeAccount(token, body.verifyCode)
         return json_res(**result)
 
