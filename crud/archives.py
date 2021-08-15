@@ -2,9 +2,9 @@ from sql import db
 from sql.t_archives import t_archives
 from sql.t_tags import t_tags
 from sql.t_tags_archives import t_tags_archives
-from utils.timeCovert import toTimeStamp
+from utils.covert import toTimeStamp
 from utils.log import log
-from utils.jsonCovert import sqlToJson
+from utils.covert import sqlToJson
 
 
 def queryArchiveList():
