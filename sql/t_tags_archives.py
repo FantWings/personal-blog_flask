@@ -1,9 +1,8 @@
 from . import db
-from sqlalchemy.sql import func
 
 
 class t_tags_archives(db.Model):
-    __tablename__ = "t_tags_archvies"
+    __tablename__ = "t_tags_archives"
     id = db.Column(db.Integer, primary_key=True, comment='映射号')
     tag_id = db.Column(
         db.Integer,
@@ -13,7 +12,7 @@ class t_tags_archives(db.Model):
     )
     arch_id = db.Column(
         db.Integer,
-        db.ForeignKey("t_archvies.id"),
+        db.ForeignKey("t_archives.id"),
         nullable=False,
         comment='文章ID',
     )

@@ -1,12 +1,12 @@
 from . import db
 from sqlalchemy.sql import func
-
-print("+++++++")
+from utils.gen import genUuid
 
 
 class t_user(db.Model):
     __tablename__ = "t_user"
     id = db.Column(db.Integer, primary_key=True, nullable=False, comment='索引')
+    username = db.Column(db.String(12), nullable=False, comment='用户名')
     uuid = db.Column(db.String(64),
                      nullable=False,
                      default=genUuid(),

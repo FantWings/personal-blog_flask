@@ -3,6 +3,8 @@ from sql.t_archives import t_archives
 from sql.t_tags import t_tags
 from sql.t_tags_archives import t_tags_archives
 from utils.timeCovert import toTimeStamp
+from utils.log import log
+from utils.jsonCovert import sqlToJson
 
 
 def queryArchiveList():
@@ -23,12 +25,13 @@ def queryArchiveList():
             "title": result.title,
             "update_time": toTimeStamp(result.update_time),
             "views": result.views,
-            "tags": tags
+            # "tags": tags
         })
     return {"data": data}
 
 
 def queryArchive(archId):
-    query = t_archives.query.filter_by(id).first()
-    print(query)
-    return {'data': query}
+    query = t_archives.query.filter_by(id=archId).first()
+    data = sqlToJson(query)
+    log('Opened Archive: 《{}》'.format(data.get('title', 'undefined')))
+    return {'data': data}

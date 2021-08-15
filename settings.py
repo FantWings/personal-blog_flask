@@ -1,5 +1,7 @@
+from logging import warn
 import os
 from datetime import timedelta
+from utils.log import log
 
 
 class Config(object):
@@ -9,7 +11,19 @@ class Config(object):
         os.getenv('SQL_HOST', '127.0.0.1'), os.getenv('SQL_PORT', 3306),
         os.getenv('SQL_BASE', 'blog'))
 
-    print('[INFO] SQL_URI is: {}'.format(SQLALCHEMY_DATABASE_URI))
+    log(
+        """
+
+    ********************************************************
+                      YOU ARE IN DEBUG MODE
+    ********************************************************
+    debugmode only for dev or debugging, not for producting.
+    importent config or infomation will be stdn out.
+    (sql, password, userinfo , or your top secret etc.)
+    DO NOT USE DEBUG MODE IN PRODUCTION ENV!
+    if you do this, used your own RISK!
+    """, 'warn')
+    log('SQL_URI is: {}'.format(SQLALCHEMY_DATABASE_URI), 'debug')
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

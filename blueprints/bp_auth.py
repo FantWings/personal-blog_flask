@@ -1,10 +1,12 @@
-from flask import json, request
+from logging import debug
+from flask import request
 from . import authAPI
+from utils.log import log
 
 from utils.response import json_res
 from crud.users import registerNewAccount, sendCodeByEmail, activeAccount
 
-print('[INFO] Blueprint - authAPI Loaded.')
+log('Blueprint - authAPI Loaded.')
 
 
 @authAPI.route('/register', methods=['POST'])
@@ -12,6 +14,8 @@ def register():
     submit = request.get_json()
     username = submit.get('username')
     passwd = submit.get('passwd')
+    log('Register request, user:{}, password:{}'.format(username, passwd),
+        "debug")
     result = registerNewAccount(username, passwd)
     return json_res(**result)
 

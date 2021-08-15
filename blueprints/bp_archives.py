@@ -1,10 +1,11 @@
-from flask import Blueprint, request, make_response
+from flask import request
 from . import archiveAPI
+from utils.log import log
 
 from utils.response import json_res
 from crud.archives import queryArchiveList, queryArchive
 
-print('[INFO] Blueprint - archiveAPI Loaded.')
+log('Blueprint - archiveAPI Loaded.')
 
 
 @archiveAPI.route('/getArchivesList', methods=["GET"])
@@ -24,12 +25,11 @@ def getArchivesTags():
     return json_res(data=['test', 'test2'])
 
 
-@archiveAPI.route('/getArchivesDetail/<id>', methods=['GET'])
-def getArchivesDetail(id):
+@archiveAPI.route('/getArchivesDetail/<archId>', methods=['GET'])
+def getArchivesDetail(archId):
     """
     获取文章内容
     """
-    archId = request.args.get('id')
     if not archId:
         return json_res(msg="无效的文章ID", status=1)
     result = queryArchive(archId)

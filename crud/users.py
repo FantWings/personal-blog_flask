@@ -1,9 +1,12 @@
+from logging import debug
 import random
 from flask import current_app
+from sqlalchemy.sql.functions import user
 from sql import db
 from sql.t_user import t_user
 from utils.redis import Redis
 from utils.smtp import sendmail
+from utils.log import log
 
 
 def md5(password):
@@ -33,6 +36,7 @@ def getUserId(token):
     获取用户ID
     """
     userId = Redis.read("session_{}".format(token))
+    log("Got user id: {} from token {}".format(userId, token), 'debug')
     return userId
 
 
@@ -42,20 +46,25 @@ def registerNewAccount(username, passwd):
     """
     isUserExist = t_user.query.filter_by(username=username).first()
     if isUserExist:
+        log("Register denied: 'user already exitis.', User '{}' ".format(
+            username))
         return {"status": 1, "msg": "账户已存在"}
     query = t_user(password=md5(passwd), email=username)
+    log("User {} registed a account".format(username))
     db.session.add(query)
     db.session.commit()
-    return 0
+    return {"msg": "注册成功"}
 
 
 def sendCodeByEmail(token, email):
-    uid = Redis.read("session_{}".format(token))
+    uid = getUserId(token)
     query = t_user.query.filter_by(id=uid).first()
     if query is None:
         return {"status": 1, "msg": "UID无效！"}
     verifyCode = genRandomCode(lenguth=6)
     Redis.write("verify_{}".format(uid), verifyCode, expire=300)
+    log("VerifyEmail sended to: {} for uid {}".format(email, uid))
+    log("uid {} verify code is: {}".format(uid, verifyCode), 'debug')
     sendmail(
         """
         您的本次注册验证码为：
@@ -66,14 +75,23 @@ def sendCodeByEmail(token, email):
 
 
 def activeAccount(token, verifyCode):
-    uid = Redis.read("session_{}".format(token))
-    if verifyCode != Redis.read("verify_{}".format(uid)):
+    uid = getUserId(token)
+    query = t_user.query.filter_by(id=uid).first()
+    correctCode = Redis.read("verify_{}".format(uid))
+    if uid is None:
+        log("user token {} is invaild".format(token), 'warn')
+        return {"status": 1, "msg": "登陆失效，请重新登录！"}
+    if verifyCode != correctCode:
+        log(
+            "User {} input a invaild code [{}], it should be [{}]".format(
+                query.username, verifyCode, correctCode), 'debug')
         return {"status": 1, "msg": "验证码不正确"}
 
-    query = t_user.query.filter_by(id=uid).first()
     if query is None:
+        log("User {} input a invaild args", 'warn')
         return {"status": 1, "msg": "参数有误！"}
     query.vaild = True
     db.session.commit()
+    log("user {} is account is now active".format(query.username))
     Redis.delete("verify_{}".format(uid))
     return {"msg": "账户已激活"}

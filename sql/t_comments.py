@@ -8,7 +8,7 @@ class Comments(db.Model):
     arch_id = db.Column(db.Integer,
                         nullable=False,
                         comment='文章ID',
-                        ForeignKey("archvies.id"))
+                        ForeignKey("archives.id"))
     comment = db.Column(db.String(64), nullable=False, comment='评论')
     create_time = db.Column(db.DateTime,
                             nullable=False,

@@ -1,15 +1,14 @@
 from . import db
 from sqlalchemy.sql import func
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
+from . import t_user
 
 
 class t_archives(db.Model):
-    __tablename__ = "t_archvies"
+    __tablename__ = "t_archives"
     id = db.Column(db.Integer, primary_key=True, comment='文档号')
     title = db.Column(db.String(64), nullable=False, comment='标题')
-    author = db.Column(db.Integer,
-                       db.ForeignKey("t_user.uuid"),
-                       nullable=False,
-                       comment='作者')
     preview = db.Column(db.String(64), nullable=False, comment='预览内容')
     content = db.Column(db.Text, nullable=False, comment='正文')
     views = db.Column(db.Integer, nullable=False, comment='阅读数')
@@ -27,4 +26,9 @@ class t_archives(db.Model):
                             server_default=func.now(),
                             comment='修改时间',
                             onupdate=func.now())
-    user = db.relationship("t_user", backref="ref_user")
+
+    author_id = db.Column(db.Integer,
+                          db.ForeignKey("t_user.id"),
+                          nullable=False,
+                          comment='作者')
+    author = db.relationship("t_user", backref="author_of_archive")

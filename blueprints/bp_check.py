@@ -1,7 +1,8 @@
 from flask import make_response
 from . import checkAPI
+from utils.log import log
 
-print('[INFO] Blueprint - checkAPI Loaded.')
+log('Blueprint - checkAPI Loaded.')
 
 
 @checkAPI.route('/check')
