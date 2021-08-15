@@ -15,6 +15,7 @@ with app.app_context():
 
 app.register_blueprint(blueprint=blueprints.checkAPI)
 app.register_blueprint(blueprint=blueprints.archiveAPI)
+app.register_blueprint(blueprint=blueprints.authAPI)
 
 CORS(app, supports_credentials=True)
 
