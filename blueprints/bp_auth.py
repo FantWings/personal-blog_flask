@@ -3,7 +3,7 @@ from . import authAPI
 from utils.log import log
 
 from utils.response import json_res
-from crud.users import registerNewAccount, sendCodeByEmail, activeAccount
+from crud.auth import *
 
 log("Loaded AuthAPI. [Ver 1.2]")
 
@@ -29,9 +29,11 @@ def sendVerfiyCode():
         email = request.args.get("value")
         result = sendCodeByEmail(token, email)
         return json_res(**result)
+    else:
+        return json_res(msg="接口参数错误！", status=1)
 
 
-@authAPI.route("/verifyAccount", method=["POST"])
+@authAPI.route("/verifyAccount", methods=["POST"])
 def verifyAccount():
     token = request.headers.get("token", default=0)
     method = request.args.get("method")
@@ -42,10 +44,12 @@ def verifyAccount():
     if method == "email":
         result = activeAccount(token, body.verifyCode)
         return json_res(**result)
+    else:
+        return json_res(msg="接口参数错误！", status=1)
 
 
-# @authAPI.route('/login', methods=['POST'])
-# def login():
-#     """
-
-#     """
+@authAPI.route("/login", methods=["POST"])
+def login():
+    body = request.get_json()
+    result = userLogin(body.username, body.password)
+    return json_res(**result)
