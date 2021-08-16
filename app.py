@@ -1,13 +1,14 @@
 from flask import Flask
 from flask_cors import CORS
 
-from settings import Config
+from settings import FlaskConfig
 from sql import db
+
 
 import blueprints
 
 app = Flask(__name__)
-app.config.from_object(Config)
+app.config.from_object(FlaskConfig)
 
 with app.app_context():
     db.init_app(app)
