@@ -12,14 +12,15 @@ log("Loaded AuthAPI. [Ver 1.2]")
 def register():
     submit = request.get_json()
     username = submit.get("username")
-    passwd = submit.get("passwd")
-    log("Register request, user:{}, password:{}".format(username, passwd), "debug")
-    result = registerNewAccount(username, passwd)
+    password = submit.get("password")
+    email = submit.get("email")
+    log("Register request, user:{}, password:{}".format(username, password), "debug")
+    result = registerNewAccount(username, password, email)
     return json_res(**result)
 
 
-@authAPI.route("/sendVerfiyCode", methods=["GET"])
-def sendVerfiyCode():
+@authAPI.route("/2fa/sendVerifyCode", methods=["GET"])
+def sendVerifyCode():
     token = request.headers.get("token", default=0)
     method = request.args.get("method")
 
@@ -33,8 +34,8 @@ def sendVerfiyCode():
         return json_res(msg="接口参数错误！", status=1)
 
 
-@authAPI.route("/verifyAccount", methods=["POST"])
-def verifyAccount():
+@authAPI.route("/2fa/bound", methods=["POST"])
+def bound2fa():
     token = request.headers.get("token", default=0)
     method = request.args.get("method")
     body = request.get_json()
@@ -42,7 +43,7 @@ def verifyAccount():
     if method == "sms":
         return json_res(msg="方法暂未开放", status=1)
     if method == "email":
-        result = activeAccount(token, body.verifyCode)
+        result = add2FAToAccount(token, body['verifyCode'])
         return json_res(**result)
     else:
         return json_res(msg="接口参数错误！", status=1)
@@ -51,5 +52,5 @@ def verifyAccount():
 @authAPI.route("/login", methods=["POST"])
 def login():
     body = request.get_json()
-    result = userLogin(body.username, body.password)
+    result = userLogin(body["username"], body["password"])
     return json_res(**result)
