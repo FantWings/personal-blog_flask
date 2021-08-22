@@ -1,11 +1,9 @@
 from flask import Flask
 from flask_cors import CORS
-
 from settings import FlaskConfig
 from sql import db
-
-
 import blueprints
+
 
 app = Flask(__name__)
 app.config.from_object(FlaskConfig)
@@ -17,6 +15,7 @@ with app.app_context():
 app.register_blueprint(blueprint=blueprints.checkAPI)
 app.register_blueprint(blueprint=blueprints.archiveAPI)
 app.register_blueprint(blueprint=blueprints.authAPI)
+app.register_blueprint(blueprint=blueprints.userAPI)
 
 CORS(app, supports_credentials=True)
 

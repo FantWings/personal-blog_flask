@@ -12,12 +12,12 @@ def loginRequired(fn):
     装饰器函数，用来装饰需要登录之后才可执行的函数，返回用户token给调用他的函数
     """
 
-    def getUserId(token, *args):
+    def getUserId(token, *args, **xargs):
         # 使用token从redis中读取用户ID
         userId = Redis.read("session_{}".format(token))
         if userId:
             log("Got user id: {} from token {}".format(userId, token), "debug")
-            fn(userId, *args)
+            return fn(userId, *args, **xargs)
         else:
             log("User token {} is invaild".format(token), "debug")
             return {"status": 10, "msg": "需要登录"}
@@ -25,19 +25,33 @@ def loginRequired(fn):
     return getUserId
 
 
-def registerNewAccount(username, passwd):
+def registerNewAccount(username, password, email):
     """
     注册一个新账户
     """
-    isUserExist = t_user.query.filter_by(username=username).first()
-    if isUserExist:
-        log("Register denied: 'user already exitis.', User '{}' ".format(username))
+    if username is None or password is None or email is None:
+        return {"status": 1, "msg": "必要参数缺失！"}
+    if t_user.query.filter_by(username=username).first():
+        log("Register denied: 'user {} already exitis.'".format(username))
         return {"status": 1, "msg": "账户已存在"}
-    query = t_user(password=md5(passwd), email=username)
-    log("User {} registed a account".format(username))
-    db.session.add(query)
+    if t_user.query.filter_by(email=email).first():
+        log("Register denied: 'email {} already used.'".format(email))
+        return {"status": 1, "msg": "邮箱已被占用"}
+    addUser = t_user(password=md5(password), username=username, email=email)
+    log(
+        "User {} registed a account, email: {}, pwd: {}".format(
+            username, email, password
+        )
+    )
+    db.session.add(addUser)
     db.session.commit()
-    return {"msg": "注册成功"}
+
+    query = t_user.query.with_entities(t_user.id).filter_by(username=username).first()
+    token = genToken(32)
+    Redis.write("session_{}".format(token), query.id)
+    log("Autologged in this new user, token: {}".format(token))
+
+    return {"data": {"token": token}}
 
 
 @loginRequired
@@ -60,15 +74,13 @@ def sendCodeByEmail(uid, email):
         "账户注册",
         current_app.config.get("SITE_NAME"),
     )
-    return {"msg": "账户已成功注册"}
+    return {"msg": "验证码已发送"}
 
 
 @loginRequired
-def activeAccount(uid, verifyCode):
+def add2FAToAccount(uid, verifyCode):
     query = t_user.query.filter_by(id=uid).first()
     correctCode = Redis.read("verify_{}".format(uid))
-    if uid is None:
-        return {"status": 1, "msg": "登陆失效，请重新登录！"}
     if verifyCode != correctCode:
         log(
             "User {} input a invaild code [{}], it should be [{}]".format(
@@ -85,21 +97,27 @@ def activeAccount(uid, verifyCode):
     db.session.commit()
     log("user {} is account is now active".format(query.username))
     Redis.delete("verify_{}".format(uid))
-    return {"msg": "账户已激活"}
+    return {"msg": "邮箱绑定成功"}
 
 
 def userLogin(username, password):
-    if username or password is None:
+    if username is None or password is None:
         return {"status": 1, "msg": "接口参数错误！"}
     query = (
-        t_user.query.with_entities(t_user.password).filter_by(username=username).first()
+        t_user.query.with_entities(t_user.id, t_user.password)
+        .filter_by(username=username)
+        .first()
     )
-    if md5(password) == query.passowrd:
-        token = genToken(32)
-        Redis.write("session_{}".format(username), token)
-        log(
-            "User {} Login Successful, gened user token {} return to user.".format(
-                username, token
-            )
+    if query is None:
+        return {"status": 1, "msg": "用户名或密码错误"}
+    if md5(password) != query.password:
+        return {"status": 1, "msg": "用户名或密码错误"}
+
+    token = genToken(32)
+    Redis.write("session_{}".format(token), query.id)
+    log(
+        "User {} Login Successful, UID: {}, gened user token {} return to user.".format(
+            username, query.id, token
         )
-        return {"msg": "登录成功", "data": {"token": token}}
+    )
+    return {"data": {"token": token}}

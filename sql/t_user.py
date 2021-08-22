@@ -29,4 +29,3 @@ class t_user(db.Model):
         comment="修改时间",
         onupdate=func.now(),
     )
-    vaild = db.Column(db.Boolean, nullable=False, default=False, comment="账户状态")
