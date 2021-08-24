@@ -19,6 +19,7 @@ class t_user(db.Model):
         unique=True,
     )
     qq = db.Column(db.String(13), comment="QQ号")
+    role = db.Column(db.Integer, nullable=False, default=0, comment="权限等级")
     create_time = db.Column(
         db.DateTime, nullable=False, server_default=func.now(), comment="创建时间"
     )
@@ -29,6 +30,7 @@ class t_user(db.Model):
         comment="修改时间",
         onupdate=func.now(),
     )
+
     # 邮箱（外键）
     email_addr = db.Column(
         db.String(32), db.ForeignKey("t_email.email"), nullable=False, comment="邮箱"

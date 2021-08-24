@@ -15,5 +15,6 @@ def queryUser(uid):
         "email": {"addr": query.email.email, "verifyed": query.email.verifyed},
         "phone": query.phone,
         "qq": query.qq,
+        "role": query.role
     }
     return {"data": data}
