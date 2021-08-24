@@ -1,4 +1,5 @@
 from . import db
+from . import t_email
 from sqlalchemy.sql import func
 from utils.gen import genUuid
 
@@ -6,11 +7,10 @@ from utils.gen import genUuid
 class t_user(db.Model):
     __tablename__ = "t_user"
     id = db.Column(db.Integer, primary_key=True, nullable=False, comment="索引")
-    username = db.Column(db.String(12), nullable=False, comment="用户名")
+    username = db.Column(db.String(16), nullable=False, comment="用户名")
     uuid = db.Column(db.String(64), nullable=False, default=genUuid(), comment="用户UUID")
     avatar = db.Column(db.String(64), comment="头像")
     password = db.Column(db.String(32), comment="密码")
-    email = db.Column(db.String(32), nullable=False, comment="邮箱", unique=True)
     phone = db.Column(
         db.String(11),
         # 手机号验证功能没做完，暂时注释必填字段
@@ -29,3 +29,8 @@ class t_user(db.Model):
         comment="修改时间",
         onupdate=func.now(),
     )
+    # 邮箱（外键）
+    email_addr = db.Column(
+        db.String(32), db.ForeignKey("t_email.email"), nullable=False, comment="邮箱"
+    )
+    email = db.relationship("t_email", backref="email_of_user")

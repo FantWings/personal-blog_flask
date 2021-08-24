@@ -1,6 +1,7 @@
 from flask import current_app
 from sql import db
 from sql.t_user import t_user
+from sql.t_email import t_email
 from utils.redis import Redis
 from utils.smtp import sendmail
 from utils.log import log
@@ -29,21 +30,31 @@ def registerNewAccount(username, password, email):
     """
     注册一个新账户
     """
+    # 参数检查
     if username is None or password is None or email is None:
         return {"status": 1, "msg": "必要参数缺失！"}
+
+    # 检查邮箱是否已使用
+    if t_email.query.filter_by(email=email).first():
+        log("Register denied: 'email {} already used.'".format(email))
+        return {"status": 1, "msg": "邮箱已被占用"}
+    # 写入邮箱到数据库
+    addEmail = t_email(email=email)
+    db.session.add(addEmail)
+
+    # 检查用户名是否已使用
     if t_user.query.filter_by(username=username).first():
         log("Register denied: 'user {} already exitis.'".format(username))
         return {"status": 1, "msg": "账户已存在"}
-    if t_user.query.filter_by(email=email).first():
-        log("Register denied: 'email {} already used.'".format(email))
-        return {"status": 1, "msg": "邮箱已被占用"}
-    addUser = t_user(password=md5(password), username=username, email=email)
+    # 写入用户名到数据库
+    addUser = t_user(password=md5(password), username=username, email_addr=email)
     log(
         "User {} registed a account, email: {}, pwd: {}".format(
             username, email, password
         )
     )
     db.session.add(addUser)
+
     db.session.commit()
 
     query = t_user.query.with_entities(t_user.id).filter_by(username=username).first()

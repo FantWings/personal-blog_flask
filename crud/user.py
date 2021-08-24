@@ -12,7 +12,7 @@ def queryUser(uid):
         "username": query.username,
         "uuid": query.uuid,
         "avatar": query.avatar,
-        "email": query.email,
+        "email": {"addr": query.email.email, "verifyed": query.email.verifyed},
         "phone": query.phone,
         "qq": query.qq,
     }
