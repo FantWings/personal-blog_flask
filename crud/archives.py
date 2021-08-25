@@ -22,7 +22,7 @@ def queryArchiveList():
             {
                 "cover_image": result.cover_image,
                 "id": result.id,
-                "preview": result.content[:30].split('\n\n')[1],
+                "preview": result.content[:120].split("\n\n")[1],
                 "time_for_read": result.time_for_read,
                 "title": result.title,
                 "update_time": toTimeStamp(result.update_time),

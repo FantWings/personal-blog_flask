@@ -5,7 +5,8 @@ from sql.t_email import t_email
 from utils.redis import Redis
 from utils.smtp import sendmail
 from utils.log import log
-from utils.gen import genToken, md5, genRandomCode
+from utils.gen import genToken, genMd5Password, genRandomCode
+from hashlib import md5
 
 
 def loginRequired(fn):
@@ -47,7 +48,14 @@ def registerNewAccount(username, password, email):
         log("Register denied: 'user {} already exitis.'".format(username))
         return {"status": 1, "msg": "账户已存在"}
     # 写入用户名到数据库
-    addUser = t_user(password=md5(password), username=username, email_addr=email)
+    addUser = t_user(
+        password=genMd5Password(password),
+        username=username,
+        email_addr=email,
+        avatar="https://cn.gravatar.com/avatar/{}".format(
+            md5(email.encode("utf-8")).hexdigest()
+        ),
+    )
     log(
         "User {} registed a account, email: {}, pwd: {}".format(
             username, email, password
@@ -121,7 +129,7 @@ def userLogin(username, password):
     )
     if query is None:
         return {"status": 1, "msg": "用户名或密码错误"}
-    if md5(password) != query.password:
+    if genMd5Password(password) != query.password:
         return {"status": 1, "msg": "用户名或密码错误"}
 
     token = genToken(32)

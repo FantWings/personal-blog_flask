@@ -21,7 +21,7 @@ def genUuid():
     return uuid.uuid1().hex
 
 
-def md5(password):
+def genMd5Password(password):
     """
     MD5生成
     """
