@@ -1,9 +1,10 @@
 from sql import db
 from sql.t_archives import t_archives
+from sql.t_comments import t_comments
 
 # from sql.t_tags import t_tags
 # from sql.t_tags_archives import t_tags_archives
-# from sql.t_user import t_user
+from sql.t_user import t_user
 from utils.covert import toTimeStamp
 from utils.log import log
 from utils.covert import toTimeStamp
@@ -22,7 +23,7 @@ def queryArchiveList():
             {
                 "cover_image": result.cover_image,
                 "id": result.id,
-                "preview": result.content[:120].split("\n\n")[1],
+                "preview": result.content[:120].split("\n\n"),
                 "time_for_read": result.time_for_read,
                 "title": result.title,
                 "update_time": toTimeStamp(result.update_time),
@@ -95,3 +96,28 @@ def updateArchive(uid, archId, title, content, cover_image="", time_for_read=5):
     db.session.commit()
 
     return {"status": 0}
+
+
+@loginRequired
+def addComment(uid, archId, comment):
+    # user = t_user.query.filter_by(id=uid).first()
+    addComment = t_comments(arch_id=archId, user_id=uid, comment=comment)
+    db.session.add(addComment)
+    db.session.commit()
+    return {"status": 0}
+
+
+def queryComment(archId):
+    comments = t_comments.query.filter_by(arch_id=archId).all()
+    data = []
+    for result in comments:
+        data.append(
+            {
+                "nickname": result.user.username,
+                "email": result.user.email.email,
+                "avatar": result.user.avatar,
+                "comment": result.comment,
+                "time": toTimeStamp(result.create_time),
+            }
+        )
+    return {"data": data}

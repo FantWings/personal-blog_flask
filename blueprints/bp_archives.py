@@ -62,3 +62,18 @@ def apiDeleteArchive():
     archId = request.args.get("archId")
     result = deleteArchive(token, archId)
     return json_res(**result)
+
+
+@archiveAPI.route("/comment", methods=["GET", "POST"])
+def apiCommentArchive():
+    """评论文章"""
+    archId = request.args.get("archId")
+    if request.method == "GET":
+        result = queryComment(archId)
+
+    if request.method == "POST":
+        token = request.headers.get("token")
+        body = request.get_json()
+        result = addComment(token, archId, **body)
+
+    return json_res(**result)
