@@ -120,7 +120,6 @@ def queryComment(archId):
             {
                 "id": result.id,
                 "nickname": result.user.username,
-                "email": result.user.email.email,
                 "avatar": result.user.avatar,
                 "comment": result.comment,
                 "time": toTimeStamp(result.create_time),
