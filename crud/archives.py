@@ -100,7 +100,8 @@ def updateArchive(uid, archId, title, content, cover_image="", time_for_read=5):
 
 @loginRequired
 def addComment(uid, archId, comment):
-    # user = t_user.query.filter_by(id=uid).first()
+    if len(comment) <= 0:
+        return {"status": 2, "msg": "评论内容不可为空"}
     addComment = t_comments(arch_id=archId, user_id=uid, comment=comment)
     db.session.add(addComment)
     db.session.commit()
@@ -108,11 +109,16 @@ def addComment(uid, archId, comment):
 
 
 def queryComment(archId):
-    comments = t_comments.query.filter_by(arch_id=archId).all()
+    comments = (
+        t_comments.query.filter_by(arch_id=archId)
+        .order_by(t_comments.create_time.desc())
+        .all()
+    )
     data = []
     for result in comments:
         data.append(
             {
+                "id": result.id,
                 "nickname": result.user.username,
                 "email": result.user.email.email,
                 "avatar": result.user.avatar,

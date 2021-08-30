@@ -43,7 +43,7 @@ def bound2fa():
     if method == "sms":
         return json_res(msg="方法暂未开放", status=1)
     if method == "email":
-        result = add2FAToAccount(token, body['verifyCode'])
+        result = add2FAToAccount(token, body["verifyCode"])
         return json_res(**result)
     else:
         return json_res(msg="接口参数错误！", status=1)
@@ -53,4 +53,11 @@ def bound2fa():
 def login():
     body = request.get_json()
     result = userLogin(body["username"], body["password"])
+    return json_res(**result)
+
+
+@authAPI.route("/logout", methods=["GET"])
+def logout():
+    token = request.headers.get("token")
+    result = logoutUser(token, token)
     return json_res(**result)

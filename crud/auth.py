@@ -19,6 +19,8 @@ def loginRequired(fn):
         userId = Redis.read("session_{}".format(token))
         if userId:
             log("Got user id: {} from token {}".format(userId, token), "debug")
+            # 刷新Token有效期
+            Redis.expire("session_{}".format(token))
             return fn(userId, *args, **xargs)
         else:
             log("User token {} is invaild".format(token), "debug")
@@ -140,3 +142,11 @@ def userLogin(username, password):
         )
     )
     return {"data": {"token": token}}
+
+
+@loginRequired
+def logoutUser(uid, token):
+    if uid:
+        log("User {} logged out.".format(uid))
+        Redis.delete("session_{}".format(token))
+        return {}
