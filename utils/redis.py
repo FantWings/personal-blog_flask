@@ -19,7 +19,7 @@ class Redis(object):
         if expire:
             expire_in_seconds = expire
         else:
-            expire_in_seconds = current_app.config["REDIS_EXPIRE"]
+            expire_in_seconds = current_app.config["REDIS_SESSION_TIMELIFE"]
         r = cls._get_r()
         r.set(key, value, ex=expire_in_seconds)
 
@@ -66,6 +66,6 @@ class Redis(object):
         if expire:
             expire_in_seconds = expire
         else:
-            expire_in_seconds = current_app.config["REDIS_EXPIRE"]
+            expire_in_seconds = current_app.config["REDIS_SESSION_TIMELIFE"]
         r = cls._get_r()
         r.expire(name, expire_in_seconds)

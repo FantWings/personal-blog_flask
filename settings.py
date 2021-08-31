@@ -1,38 +1,32 @@
-from os import path, urandom
-from datetime import timedelta
-
+from os import path, urandom, getenv
 from utils.log import log
-import configparser
-
-base_dir = path.abspath(path.dirname(__file__))
-ini = configparser.ConfigParser()
-ini.read("config.ini", encoding="utf-8")
 
 
 class FlaskConfig(object):
     """FLASK配置"""
 
     SECRET_KEY = urandom(24)
-    PERMANENT_SESSION_LIFETIME = timedelta(days=31)
 
     """ SMTP配置 """
-    SMTP_USER = ini.get("smtp", "user")
-    SMTP_PASS = ini.get("smtp", "pass")
-    SMTP_HOST = ini.get("smtp", "host")
-    SMTP_PORT = ini.get("smtp", "port")
+    SMTP_USER = getenv("SMTP_USER", "noreply@yourdomain.com")
+    SMTP_PASS = getenv("SMTP_PASS", "SUPERPASSWD")
+    SMTP_HOST = getenv("SMTP_HOST", "smtp.example.com")
+    SMTP_PORT = getenv("SMTP_PORT", "465")
 
     """数据库配置"""
-    if ini.get("db", "mode") == "mysql":
+    if getenv("SQL_ENGINE", "sqlite") == "mysql":
         # 拼接SQL URI
         database_uri = "mysql://%s:%s@%s:%s/%s" % (
-            ini.get("db", "user"),
-            ini.get("db", "pass"),
-            ini.get("db", "host"),
-            ini.get("db", "port"),
-            ini.get("db", "base"),
+            getenv("SQL_USER", "root"),
+            getenv("SQL_PASS", ""),
+            getenv("SQL_HOST", "127.0.0.1"),
+            getenv("SQL_PORT", "3306"),
+            getenv("SQL_DB", "BaseName"),
         )
     else:
         database_uri = False
+
+    base_dir = path.abspath(path.dirname(__file__))
     SQLALCHEMY_DATABASE_URI = database_uri or "sqlite:///" + path.join(
         base_dir, "sqlite.db"
     )
@@ -41,10 +35,10 @@ class FlaskConfig(object):
     JSON_AS_ASCII = False
 
     """Redis配置"""
-    REDIS_HOST = ini.get("redis", "host")
-    REDIS_PORT = ini.get("redis", "port")
-    REDIS_DB = ini.get("redis", "db")
-    REDIS_EXPIRE = ini.get("redis", "expire")
+    REDIS_HOST = getenv("REDIS_HOST", "127.0.0.1")
+    REDIS_PORT = getenv("REDIS_PORT", "6379")
+    REDIS_DB = getenv("REDIS_DB", "0")
+    REDIS_SESSION_TIMELIFE = getenv("REDIS_SESSION_TIMELIFE", "300")
 
     log(
         """
