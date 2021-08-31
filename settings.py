@@ -21,7 +21,7 @@ class FlaskConfig(object):
             getenv("SQL_PASS", ""),
             getenv("SQL_HOST", "127.0.0.1"),
             getenv("SQL_PORT", "3306"),
-            getenv("SQL_DB", "BaseName"),
+            getenv("SQL_BASE", "BaseName"),
         )
     else:
         database_uri = False
