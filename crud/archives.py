@@ -115,14 +115,15 @@ def queryComment(archId):
         .all()
     )
     data = []
-    for result in comments:
-        data.append(
-            {
-                "id": result.id,
-                "nickname": result.user.username,
-                "avatar": result.user.avatar,
-                "comment": result.comment,
-                "time": toTimeStamp(result.create_time),
-            }
-        )
+    if comments:
+        for result in comments:
+            data.append(
+                {
+                    "id": result.id,
+                    "nickname": result.user.username,
+                    "avatar": result.user.avatar,
+                    "comment": result.comment,
+                    "time": toTimeStamp(result.create_time),
+                }
+            )
     return {"data": data}
