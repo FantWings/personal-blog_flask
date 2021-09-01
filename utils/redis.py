@@ -2,6 +2,13 @@ import redis
 from flask import current_app
 from utils.log import log
 
+###################################################
+#           Redis SDK For Python Flask            #
+#        for more infomation please visit:        #
+#   https://github.com/FantWings/flask-redis_sdk  #
+###################################################
+
+
 log("Loaded Redis Library [Ver 1.2]")
 
 
