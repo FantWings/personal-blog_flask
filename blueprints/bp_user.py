@@ -17,7 +17,7 @@ def getRoleInfo():
     """获取用户权限"""
     token = request.headers.get("token")
     result = queryRole(token)
-    return json_res(result)
+    return json_res(**result)
 
 
 @userAPI.route("/avatar", methods=["GET"])
@@ -25,4 +25,4 @@ def getUserAvatar():
     """获取用户头像"""
     username = request.args.get("username")
     result = queryAvatar(username)
-    return json_res(result)
+    return json_res(**result)

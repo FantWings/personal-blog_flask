@@ -33,9 +33,11 @@ def queryRole(uid):
 
 def queryAvatar(email):
     query = (
-        t_user.query.with_entities(t_user.avatar).filter_by(email_addr=email).first()
+        t_user.query.with_entities(t_user.avatar, t_user.nickname)
+        .filter_by(email_addr=email)
+        .first()
     )
-
     if not query:
         return {"data": None}
-    return {"data": query.avatar}
+
+    return {"data": {"avatar": query.avatar, "nickname": query.nickname}}
