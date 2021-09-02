@@ -23,7 +23,7 @@ def queryArchiveList():
             {
                 "cover_image": result.cover_image,
                 "id": result.id,
-                "preview": result.content[:120].split("\n\n"),
+                "preview": result.content[:300].split("\n\n"),
                 "time_for_read": result.time_for_read,
                 "title": result.title,
                 "update_time": toTimeStamp(result.update_time),
@@ -57,7 +57,7 @@ def queryArchive(archId):
 
 
 @loginRequired
-def addArchive(uid, title, content, cover_image="", time_for_read=5):
+def addArchive(uid, title, content, cover_image, tags, time_for_read=5):
     newArchive = t_archives(
         title=title,
         content=content,
@@ -83,9 +83,9 @@ def deleteArchive(uid, archId):
 
 
 @loginRequired
-def updateArchive(uid, archId, title, content, cover_image="", time_for_read=5):
+def updateArchive(uid, archId, title, content, cover_image, tags, time_for_read=5):
     query = t_archives.query.filter_by(id=archId).first()
-    if int(uid) is not query.author_id:
+    if uid is not query.author_id:
         return {"status": 1, "msg": "你不能修改不属于你的文章"}
     query.title = title
     query.content = content
