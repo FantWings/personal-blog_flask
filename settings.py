@@ -1,6 +1,21 @@
 from os import path, urandom, getenv
 from utils.log import log
 
+log(
+    """
+********************************************************
+                    ！ ！WARNING ！ ！
+********************************************************
+YOU ARE IN DEBUG MODE！
+debugmode only for dev or debugging, not for producting.
+importent config or infomation will be stdn out.
+(sql, password, userinfo , or your top secret etc.)
+DO NOT USE DEBUG MODE IN PRODUCTION ENV!
+if you do this, used your own RISK!
+""",
+    "warn",
+)
+
 
 class FlaskConfig(object):
     """FLASK配置"""
@@ -23,13 +38,19 @@ class FlaskConfig(object):
             getenv("SQL_PORT", "3306"),
             getenv("SQL_BASE", "BaseName"),
         )
+        log("Using MySQL for SQL Engine.", "info")
     else:
         database_uri = False
+        log("Using SQLite for SQL Engine.", "info")
 
+    # 数据库路径
     base_dir = path.abspath(path.dirname(__file__))
     SQLALCHEMY_DATABASE_URI = database_uri or "sqlite:///" + path.join(
         base_dir, "sqlite.db"
     )
+    log("SQL_URI is: {}".format(SQLALCHEMY_DATABASE_URI), "debug")
+
+    # sqlalchemy配置
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = False
     JSON_AS_ASCII = False
@@ -39,19 +60,3 @@ class FlaskConfig(object):
     REDIS_PORT = getenv("REDIS_PORT", "6379")
     REDIS_DB = getenv("REDIS_DB", "0")
     REDIS_SESSION_TIMELIFE = getenv("REDIS_SESSION_TIMELIFE", "300")
-
-    log(
-        """
-    ********************************************************
-                      YOU ARE IN DEBUG MODE
-    ********************************************************
-    debugmode only for dev or debugging, not for producting.
-    importent config or infomation will be stdn out.
-    (sql, password, userinfo , or your top secret etc.)
-    DO NOT USE DEBUG MODE IN PRODUCTION ENV!
-    if you do this, used your own RISK!
-    """,
-        "warn",
-    )
-
-    log("SQL_URI is: {}".format(SQLALCHEMY_DATABASE_URI), "debug")
