@@ -59,5 +59,5 @@ def login():
 @authAPI.route("/logout", methods=["GET"])
 def logout():
     token = request.headers.get("token")
-    result = logoutUser(token, token)
+    result = logoutUser(token)
     return json_res(**result)
