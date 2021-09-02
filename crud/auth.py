@@ -1,4 +1,4 @@
-from flask import current_app
+# from flask import current_app
 from sql import db
 from sql.t_user import t_user
 from sql.t_email import t_email
@@ -7,6 +7,7 @@ from utils.smtp import sendmail
 from utils.log import log
 from utils.gen import genToken, genMd5Password, genRandomCode
 from hashlib import md5
+from utils.gen import genUuid
 
 
 def loginRequired(fn):
@@ -29,12 +30,12 @@ def loginRequired(fn):
     return getUserId
 
 
-def registerNewAccount(username, password, email):
+def registerNewAccount(email, password, nickname):
     """
     注册一个新账户
     """
     # 参数检查
-    if username is None or password is None or email is None:
+    if email is None or password is None:
         return {"status": 1, "msg": "必要参数缺失！"}
 
     # 检查邮箱是否已使用
@@ -45,29 +46,29 @@ def registerNewAccount(username, password, email):
     addEmail = t_email(email=email)
     db.session.add(addEmail)
 
-    # 检查用户名是否已使用
-    if t_user.query.filter_by(username=username).first():
-        log("Register denied: 'user {} already exitis.'".format(username))
-        return {"status": 1, "msg": "账户已存在"}
     # 写入用户名到数据库
     addUser = t_user(
         password=genMd5Password(password),
-        username=username,
+        nickname=nickname,
         email_addr=email,
         avatar="https://cn.gravatar.com/avatar/{}".format(
             md5(email.encode("utf-8")).hexdigest()
         ),
+        uuid=genUuid(),
     )
     log(
         "User {} registed a account, email: {}, pwd: {}".format(
-            username, email, password
+            nickname, email, password
         )
     )
     db.session.add(addUser)
-
     db.session.commit()
 
-    query = t_user.query.with_entities(t_user.id).filter_by(username=username).first()
+    query = (
+        t_user.query.with_entities(t_user.id)
+        .filter_by(email_addr=email, deleted=0)
+        .first()
+    )
     token = genToken(32)
     Redis.write("session_{}".format(token), query.id)
     log("Autologged in this new user, token: {}".format(token))
@@ -75,50 +76,50 @@ def registerNewAccount(username, password, email):
     return {"data": {"token": token}}
 
 
-@loginRequired
-def sendCodeByEmail(uid, email):
-    query = t_user.query.filter_by(id=uid).first()
-    if query is None:
-        return {"status": 1, "msg": "UID无效！"}
-    verifyCode = genRandomCode(lenguth=6)
-    Redis.write("verify_{}".format(uid), verifyCode, expire=300)
-    log("VerifyEmail sended to: {} for uid {}".format(email, uid))
-    log("uid {} verify code is: {}".format(uid, verifyCode), "debug")
-    sendmail(
-        """
-        您的本次注册验证码为：
-        {0}
-        """.format(
-            verifyCode
-        ),
-        email,
-        "账户注册",
-        current_app.config.get("SITE_NAME"),
-    )
-    return {"msg": "验证码已发送"}
+# @loginRequired
+# def sendCodeByEmail(uid, email):
+#     query = t_user.query.filter_by(id=uid).first()
+#     if query is None:
+#         return {"status": 1, "msg": "UID无效！"}
+#     verifyCode = genRandomCode(lenguth=6)
+#     Redis.write("verify_{}".format(uid), verifyCode, expire=300)
+#     log("VerifyEmail sended to: {} for uid {}".format(email, uid))
+#     log("uid {} verify code is: {}".format(uid, verifyCode), "debug")
+#     sendmail(
+#         """
+#         您的本次注册验证码为：
+#         {0}
+#         """.format(
+#             verifyCode
+#         ),
+#         email,
+#         "账户注册",
+#         current_app.config.get("SITE_NAME"),
+#     )
+#     return {"msg": "验证码已发送"}
 
 
-@loginRequired
-def add2FAToAccount(uid, verifyCode):
-    query = t_user.query.filter_by(id=uid).first()
-    correctCode = Redis.read("verify_{}".format(uid))
-    if verifyCode != correctCode:
-        log(
-            "User {} input a invaild code [{}], it should be [{}]".format(
-                query.username, verifyCode, correctCode
-            ),
-            "debug",
-        )
-        return {"status": 1, "msg": "验证码不正确"}
+# @loginRequired
+# def add2FAToAccount(uid, verifyCode):
+#     query = t_user.query.filter_by(id=uid).first()
+#     correctCode = Redis.read("verify_{}".format(uid))
+#     if verifyCode != correctCode:
+#         log(
+#             "User {} input a invaild code [{}], it should be [{}]".format(
+#                 query.username, verifyCode, correctCode
+#             ),
+#             "debug",
+#         )
+#         return {"status": 1, "msg": "验证码不正确"}
 
-    if query is None:
-        log("User {} input a invaild args", "warn")
-        return {"status": 1, "msg": "参数有误！"}
-    query.vaild = True
-    db.session.commit()
-    log("user {} is account is now active".format(query.username))
-    Redis.delete("verify_{}".format(uid))
-    return {"msg": "邮箱绑定成功"}
+#     if query is None:
+#         log("User {} input a invaild args", "warn")
+#         return {"status": 1, "msg": "参数有误！"}
+#     query.vaild = True
+#     db.session.commit()
+#     log("user {} is account is now active".format(query.username))
+#     Redis.delete("verify_{}".format(uid))
+#     return {"msg": "邮箱绑定成功"}
 
 
 def userLogin(username, password):
@@ -126,7 +127,7 @@ def userLogin(username, password):
         return {"status": 1, "msg": "接口参数错误！"}
     query = (
         t_user.query.with_entities(t_user.id, t_user.password)
-        .filter_by(username=username)
+        .filter_by(email_addr=username)
         .first()
     )
     if query is None:
