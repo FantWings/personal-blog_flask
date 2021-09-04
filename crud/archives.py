@@ -1,13 +1,10 @@
 from sql import session as sql
 from sql.t_archive import t_archive
-from sql.t_comment import t_comment
-
-# from sql.t_user import t_user
 
 from utils.covert import toTimeStamp
 from utils.log import log
 from .auth import loginRequired
-from .tag import mapTags, getTagsList
+from .tag import mapTags, getTagsList, unmapTags
 
 
 def queryArchiveList():
@@ -84,10 +81,13 @@ def addArchive(uid, title, content, cover_image, tags, time_for_read=5):
 @loginRequired
 def deleteArchive(uid, archId):
     """删除一个文章"""
-    query = t_archive.query.filter_by(id=archId).first()
-    if int(uid) is not query.author_id:
+    archive = sql.query(t_archive).filter_by(id=archId).one_or_none()
+    if int(uid) is not archive.author_id:
         return {"status": 1, "msg": "你不能删除不属于你的文章"}
-    sql.delete(query)
+    # 解除和文章相关的外键
+    unmapTags(archId)
+    # 删除目标文章
+    sql.delete(archive)
     sql.commit()
 
     return {"status": 0}
@@ -108,35 +108,3 @@ def updateArchive(uid, archId, title, content, cover_image, tags, time_for_read=
     sql.commit()
 
     return {"status": 0}
-
-
-@loginRequired
-def addComment(uid, archId, comment):
-    """添加评论"""
-    if len(comment) <= 0:
-        return {"status": 2, "msg": "评论内容不可为空"}
-    addComment = t_comment(arch_id=archId, user_id=uid, comment=comment)
-    sql.add(addComment)
-    sql.commit()
-    return {"status": 0}
-
-
-def queryComment(archId):
-    """查询评论"""
-    comments = (
-        t_comment.query.filter_by(arch_id=archId)
-        .order_by(t_comment.create_time.desc())
-        .all()
-    )
-    data = []
-    for result in comments:
-        data.append(
-            {
-                "id": result.id,
-                "nickname": result.user.nickname,
-                "avatar": result.user.avatar,
-                "comment": result.comment,
-                "time": toTimeStamp(result.create_time),
-            }
-        )
-    return {"data": data}
