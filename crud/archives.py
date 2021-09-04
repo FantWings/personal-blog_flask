@@ -48,6 +48,7 @@ def queryArchive(archId):
             "createTime": toTimeStamp(archive.create_time),
             "updateTime": toTimeStamp(archive.update_time),
             "views": archive.views,
+            "tags": getTagsList(archive.id),
         }
         sql.commit()
         log("Opened Archive: 《{}》, visited: {}".format(archive.title, archive.views))
