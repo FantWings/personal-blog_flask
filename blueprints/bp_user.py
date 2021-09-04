@@ -12,12 +12,12 @@ def getUserInfo():
     return json_res(**result)
 
 
-@userAPI.route("/getRole", methods=["GET"])
-def getRoleInfo():
-    """获取用户权限"""
-    token = request.headers.get("token")
-    result = queryRole(token)
-    return json_res(**result)
+# @userAPI.route("/getRole", methods=["GET"])
+# def getRoleInfo():
+#     """获取用户权限"""
+#     token = request.headers.get("token")
+#     result = queryRole(token)
+#     return json_res(**result)
 
 
 @userAPI.route("/avatar", methods=["GET"])

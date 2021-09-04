@@ -1,24 +1,20 @@
 from sql import db
-from sql.t_archives import t_archives
-from sql.t_comments import t_comments
+from sql.t_archive import t_archive
+from sql.t_comment import t_comment
 
-# from sql.t_tags import t_tags
-# from sql.t_tags_archives import t_tags_archives
-from sql.t_user import t_user
+# from sql.t_user import t_user
+
 from utils.covert import toTimeStamp
 from utils.log import log
-from utils.covert import toTimeStamp
 from .auth import loginRequired
+from .tag import mapTags, getTagsList
 
 
 def queryArchiveList():
-    archives = t_archives.query.all()
-    # tags = t_tags.query.with_entities(t_tags.name).all()
-    # ref = t_tags_archives.query.all()
-    # print(ref)
+    """查询博客列表"""
+    archives = t_archive.query.all()
     data = []
     for result in archives:
-        # print(result.content.split('\n\n'))
         data.append(
             {
                 "cover_image": result.cover_image,
@@ -30,22 +26,25 @@ def queryArchiveList():
                 "views": result.views,
                 "content": result.content,
                 "author": {
-                    "username": result.author.username,
+                    "username": result.author.nickname,
                     "avatar": result.author.avatar,
                 },
+                "tags": getTagsList(result.id),
             }
         )
     return {"data": data}
 
 
 def queryArchive(archId):
-    query = t_archives.query.filter_by(id=archId).first()
+    """查询博客详细内容"""
+    query = t_archive.query.filter_by(id=archId).first()
     if query is None:
         log("Client requested unexist archive, ID={}".format(archId), "warn")
         return {"status": 1, "msg": "请求的文章不存在或被删除"}
     data = {
         "title": query.title,
-        "author": query.author.username,
+        "author": query.author.nickname,
+        "author_uuid": query.author.uuid,
         "content": query.content,
         "coverImage": query.cover_image,
         "createTime": toTimeStamp(query.create_time),
@@ -58,7 +57,8 @@ def queryArchive(archId):
 
 @loginRequired
 def addArchive(uid, title, content, cover_image, tags, time_for_read=5):
-    newArchive = t_archives(
+    """添加一个新文章"""
+    newArchive = t_archive(
         title=title,
         content=content,
         cover_image=cover_image,
@@ -66,6 +66,8 @@ def addArchive(uid, title, content, cover_image, tags, time_for_read=5):
         author_id=uid,
     )
     db.session.add(newArchive)
+    db.session.flush()
+    mapTags(tags, newArchive.id)
     db.session.commit()
 
     return {"status": 0}
@@ -73,7 +75,8 @@ def addArchive(uid, title, content, cover_image, tags, time_for_read=5):
 
 @loginRequired
 def deleteArchive(uid, archId):
-    query = t_archives.query.filter_by(id=archId).first()
+    """删除一个文章"""
+    query = t_archive.query.filter_by(id=archId).first()
     if int(uid) is not query.author_id:
         return {"status": 1, "msg": "你不能删除不属于你的文章"}
     db.session.delete(query)
@@ -84,7 +87,8 @@ def deleteArchive(uid, archId):
 
 @loginRequired
 def updateArchive(uid, archId, title, content, cover_image, tags, time_for_read=5):
-    query = t_archives.query.filter_by(id=archId).first()
+    """更新一个文章"""
+    query = t_archive.query.filter_by(id=archId).first()
     if uid is not query.author_id:
         return {"status": 1, "msg": "你不能修改不属于你的文章"}
     query.title = title
@@ -100,30 +104,31 @@ def updateArchive(uid, archId, title, content, cover_image, tags, time_for_read=
 
 @loginRequired
 def addComment(uid, archId, comment):
+    """添加评论"""
     if len(comment) <= 0:
         return {"status": 2, "msg": "评论内容不可为空"}
-    addComment = t_comments(arch_id=archId, user_id=uid, comment=comment)
+    addComment = t_comment(arch_id=archId, user_id=uid, comment=comment)
     db.session.add(addComment)
     db.session.commit()
     return {"status": 0}
 
 
 def queryComment(archId):
+    """查询评论"""
     comments = (
-        t_comments.query.filter_by(arch_id=archId)
-        .order_by(t_comments.create_time.desc())
+        t_comment.query.filter_by(arch_id=archId)
+        .order_by(t_comment.create_time.desc())
         .all()
     )
     data = []
-    if comments:
-        for result in comments:
-            data.append(
-                {
-                    "id": result.id,
-                    "nickname": result.user.username,
-                    "avatar": result.user.avatar,
-                    "comment": result.comment,
-                    "time": toTimeStamp(result.create_time),
-                }
-            )
+    for result in comments:
+        data.append(
+            {
+                "id": result.id,
+                "nickname": result.user.nickname,
+                "avatar": result.user.avatar,
+                "comment": result.comment,
+                "time": toTimeStamp(result.create_time),
+            }
+        )
     return {"data": data}

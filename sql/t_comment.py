@@ -1,15 +1,15 @@
 from . import db
 from sqlalchemy.sql import func
-from . import t_archives
+from . import t_archive
 from . import t_user
 
 
-class t_comments(db.Model):
-    __tablename__ = "t_comments"
+class t_comment(db.Model):
+    __tablename__ = "t_comment"
     id = db.Column(db.Integer, primary_key=True, comment="文档号")
     arch_id = db.Column(
         db.Integer,
-        db.ForeignKey("t_archives.id"),
+        db.ForeignKey("t_archive.id"),
         nullable=False,
         comment="文章ID",
     )
@@ -27,5 +27,5 @@ class t_comments(db.Model):
         comment="修改时间",
         onupdate=func.now(),
     )
-    arch = db.relationship("t_archives", backref="comments_belong_to")
+    arch = db.relationship("t_archive", backref="comments_belong_to")
     user = db.relationship("t_user", backref="user_of_comments")

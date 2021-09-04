@@ -11,9 +11,6 @@ log("Loaded AuthAPI. [Ver 1.2]")
 @authAPI.route("/register", methods=["POST"])
 def register():
     body = request.get_json()
-    # username = submit.get("username")
-    # password = submit.get("password")
-    # email = submit.get("email")
     log(
         "Register request, user:{email}, password:{password}".format(**body),
         "debug",

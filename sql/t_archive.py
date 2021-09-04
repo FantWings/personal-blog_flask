@@ -3,8 +3,8 @@ from . import t_user
 from sqlalchemy.sql import func
 
 
-class t_archives(db.Model):
-    __tablename__ = "t_archives"
+class t_archive(db.Model):
+    __tablename__ = "t_archive"
     id = db.Column(db.Integer, primary_key=True, comment="文档号")
     title = db.Column(db.String(64), nullable=False, comment="标题")
     content = db.Column(db.Text, nullable=False, comment="正文")
