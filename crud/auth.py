@@ -1,11 +1,12 @@
-# from flask import current_app
+from flask import request
 from sql import db
 from sql.t_user import t_user
 from sql.t_email import t_email
 from utils.redis import Redis
-from utils.smtp import sendmail
+
+# from utils.smtp import sendmail
 from utils.log import log
-from utils.gen import genToken, genMd5Password, genRandomCode
+from utils.gen import genToken, genMd5Password
 from hashlib import md5
 from utils.gen import genUuid
 
@@ -15,7 +16,9 @@ def loginRequired(fn):
     装饰器函数，用来装饰需要登录之后才可执行的函数，返回用户token给调用他的函数
     """
 
-    def getUserId(token, *args, **xargs):
+    def getUserId(*args, **xargs):
+        # 从HEADER取得TOKEN
+        token = request.headers.get("token")
         # 使用token从redis中读取用户ID
         userId = Redis.read("session_{}".format(token))
         if userId:
@@ -145,7 +148,8 @@ def userLogin(username, password):
     return {"data": {"token": token}}
 
 
-def logoutUser(token):
+def logoutUser():
+    token = request.headers.get("token")
     log("token {} deleted.".format(token))
     Redis.delete("session_{}".format(token))
     return {}

@@ -4,6 +4,7 @@ from utils.log import log
 
 from utils.response import json_res
 from crud.archives import *
+from crud.comment import *
 
 log("Loaded ArchiveAPI [Ver 1.1]")
 
@@ -39,32 +40,29 @@ def getArchivesDetail(archId):
 @archiveAPI.route("/add", methods=["POST"])
 def apiAddArchive():
     """添加文章"""
-    token = request.headers.get("token")
     body = request.get_json()
-    result = addArchive(token, **body)
+    result = addArchive(**body)
     return json_res(**result)
 
 
 @archiveAPI.route("/update", methods=["POST"])
 def apiUpdateArchive():
     """修改文章"""
-    token = request.headers.get("token")
     archId = request.args.get("archId")
     body = request.get_json()
-    result = updateArchive(token, archId, **body)
+    result = updateArchive(archId, **body)
     return json_res(**result)
 
 
 @archiveAPI.route("/delete", methods=["POST"])
 def apiDeleteArchive():
     """删除文章"""
-    token = request.headers.get("token")
     archId = request.args.get("archId")
-    result = deleteArchive(token, archId)
+    result = deleteArchive(archId)
     return json_res(**result)
 
 
-@archiveAPI.route("/comment", methods=["GET", "POST"])
+@archiveAPI.route("/comment", methods=["GET", "POST", "DELETE"])
 def apiCommentArchive():
     """评论文章"""
     archId = request.args.get("archId")
@@ -72,8 +70,11 @@ def apiCommentArchive():
         result = queryComment(archId)
 
     if request.method == "POST":
-        token = request.headers.get("token")
         body = request.get_json()
-        result = addComment(token, archId, **body)
+        result = addComment(archId, **body)
+
+    if request.method == "DELETE":
+        comment_id = request.args.get("comment_id")
+        result = deleteComment(comment_id=comment_id)
 
     return json_res(**result)

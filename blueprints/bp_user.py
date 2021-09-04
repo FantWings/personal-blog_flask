@@ -7,8 +7,7 @@ from crud.user import *
 @userAPI.route("/userInfo", methods=["GET"])
 def getUserInfo():
     """获取用户信息"""
-    token = request.headers.get("token")
-    result = queryUser(token)
+    result = queryUser()
     return json_res(**result)
 
 
