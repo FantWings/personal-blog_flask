@@ -1,4 +1,4 @@
-from sql import db
+from sql import session as sql
 from sql.t_archive import t_archive
 from sql.t_comment import t_comment
 
@@ -37,21 +37,29 @@ def queryArchiveList():
 
 def queryArchive(archId):
     """查询博客详细内容"""
-    query = t_archive.query.filter_by(id=archId).first()
-    if query is None:
+    archive = sql.query(t_archive).filter_by(id=archId).one_or_none()
+
+    try:
+        archive.views = archive.views + 1
+        sql.flush()
+        data = {
+            "title": archive.title,
+            "author": archive.author.nickname,
+            "author_uuid": archive.author.uuid,
+            "content": archive.content,
+            "coverImage": archive.cover_image,
+            "createTime": toTimeStamp(archive.create_time),
+            "updateTime": toTimeStamp(archive.update_time),
+            "views": archive.views,
+        }
+        sql.commit()
+        log("Opened Archive: 《{}》, visited: {}".format(archive.title, archive.views))
+    except AttributeError:
         log("Client requested unexist archive, ID={}".format(archId), "warn")
-        return {"status": 1, "msg": "请求的文章不存在或被删除"}
-    data = {
-        "title": query.title,
-        "author": query.author.nickname,
-        "author_uuid": query.author.uuid,
-        "content": query.content,
-        "coverImage": query.cover_image,
-        "createTime": toTimeStamp(query.create_time),
-        "updateTime": toTimeStamp(query.update_time),
-        "views": query.views,
-    }
-    log("Opened Archive: 《{}》".format(data.get("title", "undefined")))
+        return {"status": 2, "msg": "请求的文章不存在或被删除"}
+    except Exception as e:
+        return {"status": 5, "msg": e}
+
     return {"data": data}
 
 
@@ -65,10 +73,10 @@ def addArchive(uid, title, content, cover_image, tags, time_for_read=5):
         time_for_read=time_for_read,
         author_id=uid,
     )
-    db.session.add(newArchive)
-    db.session.flush()
+    sql.add(newArchive)
+    sql.flush()
     mapTags(tags, newArchive.id)
-    db.session.commit()
+    sql.commit()
 
     return {"status": 0}
 
@@ -79,8 +87,8 @@ def deleteArchive(uid, archId):
     query = t_archive.query.filter_by(id=archId).first()
     if int(uid) is not query.author_id:
         return {"status": 1, "msg": "你不能删除不属于你的文章"}
-    db.session.delete(query)
-    db.session.commit()
+    sql.delete(query)
+    sql.commit()
 
     return {"status": 0}
 
@@ -96,8 +104,8 @@ def updateArchive(uid, archId, title, content, cover_image, tags, time_for_read=
     query.cover_image = cover_image
     query.time_for_read = time_for_read
 
-    db.session.add(query)
-    db.session.commit()
+    sql.add(query)
+    sql.commit()
 
     return {"status": 0}
 
@@ -108,8 +116,8 @@ def addComment(uid, archId, comment):
     if len(comment) <= 0:
         return {"status": 2, "msg": "评论内容不可为空"}
     addComment = t_comment(arch_id=archId, user_id=uid, comment=comment)
-    db.session.add(addComment)
-    db.session.commit()
+    sql.add(addComment)
+    sql.commit()
     return {"status": 0}
 
 

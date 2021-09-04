@@ -9,7 +9,7 @@ class t_archive(db.Model):
     title = db.Column(db.String(64), nullable=False, comment="标题")
     content = db.Column(db.Text, nullable=False, comment="正文")
     views = db.Column(db.Integer, nullable=False, default=0, comment="阅读数")
-    cover_image = db.Column(db.String(32), nullable=True, comment="封面图")
+    cover_image = db.Column(db.String(256), nullable=True, comment="封面图")
     time_for_read = db.Column(
         db.SmallInteger, nullable=False, default=5, comment="所需阅读时间"
     )
