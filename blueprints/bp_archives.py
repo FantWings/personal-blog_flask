@@ -14,7 +14,8 @@ def getArchivesList():
     """
     获取博客列表
     """
-    result = queryArchiveList()
+    limit = request.args.get("limit", 10)
+    result = queryArchiveList(limit=int(limit))
     return json_res(**result)
 
 

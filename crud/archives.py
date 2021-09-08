@@ -7,9 +7,15 @@ from .auth import loginRequired
 from .tag import mapTags, getTagsList, unmapTags
 
 
-def queryArchiveList():
+def queryArchiveList(limit=10):
     """查询博客列表"""
-    archives = t_archive.query.all()
+    # archives = t_archive.query.all()
+    archives = (
+        sql.query(t_archive)
+        .order_by(t_archive.create_time.desc())
+        .limit(limit)
+        .all()
+    )
     data = []
     for result in archives:
         data.append(
