@@ -16,10 +16,12 @@ def queryUser(uid):
         "email": {"addr": query.email.email, "verifyed": query.email.verifyed},
         "phone": query.phone,
         "qq": query.qq,
-        "role": query.role,
+        "is_admin": query.is_admin,
     }
     log(
-        "Returned user info: email:{email}, uuid:{uuid}, role:{role}".format(**data),
+        "Returned user info: email:{email}, uuid:{uuid}, is_admin:{is_admin}".format(
+            **data
+        ),
         "debug",
     )
     return {"data": data}
@@ -27,8 +29,8 @@ def queryUser(uid):
 
 @loginRequired
 def queryRole(uid):
-    query = t_user.query.with_entities(t_user.role).filter_by(id=uid).first()
-    return {"data": query.role}
+    query = t_user.query.with_entities(t_user.is_admin).filter_by(id=uid).first()
+    return {"data": query.is_admin}
 
 
 def queryAvatar(email):

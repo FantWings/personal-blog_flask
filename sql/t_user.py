@@ -18,7 +18,7 @@ class t_user(db.Model):
         unique=True,
     )
     qq = db.Column(db.String(13), comment="QQ号")
-    role = db.Column(db.Integer, nullable=False, default=0, comment="权限等级")
+    is_admin = db.Column(db.Integer, nullable=False, default=0, comment="权限等级")
     deleted = db.Column(db.Integer, nullable=False, default=0, comment="注销标志")
     create_time = db.Column(
         db.DateTime, nullable=False, server_default=func.now(), comment="创建时间"
