@@ -10,6 +10,8 @@ from utils.gen import genToken, genMd5Password
 from hashlib import md5
 from utils.gen import genUuid
 
+from time import time
+
 
 def loginRequired(fn):
     """
@@ -145,7 +147,7 @@ def userLogin(username, password):
             username, query.id, token
         )
     )
-    return {"data": {"token": token}}
+    return {"data": {"token": token,"vaild_time":int(round(time()*1000))+172800000}}
 
 
 def logoutUser():
