@@ -16,7 +16,7 @@ class t_comment(db.Model):
     user_id = db.Column(
         db.Integer, db.ForeignKey("t_user.id"), nullable=False, comment="评论所属用户ID"
     )
-    comment = db.Column(db.String(64), nullable=False, comment="评论内容")
+    comment = db.Column(db.Text, nullable=False, comment="评论内容")
     create_time = db.Column(
         db.DateTime, nullable=False, default=func.now(), comment="创建时间"
     )
