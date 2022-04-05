@@ -1,5 +1,7 @@
+from sqlalchemy import func
 from sql import session as sql
 from sql.t_archive import t_archive
+from sql.t_comment import t_comment
 
 from utils.covert import toTimeStamp
 from utils.log import log
@@ -14,10 +16,12 @@ def queryArchiveList(limit=10):
         sql.query(t_archive)
         .order_by(t_archive.create_time.desc())
         .limit(limit)
-        .all()
-    )
+        .all())
+    
     data = []
     for result in archives:
+        # 查询对应博文中的评论条目数
+        query_comments_count = sql.query(func.count(t_comment.id)).filter_by(arch_id=result.id).scalar()
         data.append(
             {
                 "cover_image": result.cover_image,
@@ -25,6 +29,7 @@ def queryArchiveList(limit=10):
                 "preview": result.content[:300].split("\n\n"),
                 "time_for_read": result.time_for_read,
                 "title": result.title,
+                "create_time": toTimeStamp(result.create_time), 
                 "update_time": toTimeStamp(result.update_time),
                 "views": result.views,
                 "content": result.content,
@@ -33,6 +38,7 @@ def queryArchiveList(limit=10):
                     "avatar": result.author.avatar,
                 },
                 "tags": getTagsList(result.id),
+                "comments": query_comments_count
             }
         )
     return {"data": data}

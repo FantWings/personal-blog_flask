@@ -23,7 +23,6 @@ class t_archive(db.Model):
         comment="修改时间",
         onupdate=func.now(),
     )
-
     author_id = db.Column(
         db.Integer, db.ForeignKey("t_user.id"), nullable=False, comment="作者"
     )
