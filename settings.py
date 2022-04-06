@@ -59,4 +59,4 @@ class FlaskConfig(object):
     REDIS_HOST = getenv("REDIS_HOST", "127.0.0.1")
     REDIS_PORT = getenv("REDIS_PORT", "6379")
     REDIS_DB = getenv("REDIS_DB", "0")
-    REDIS_SESSION_TIMELIFE = getenv("REDIS_SESSION_TIMELIFE", 172800)
+    REDIS_SESSION_TIMELIFE = getenv(int("REDIS_SESSION_TIMELIFE"), 172800)
