@@ -7,17 +7,8 @@ from crud.user import *
 @userAPI.route("/userInfo", methods=["GET"])
 def getUserInfo():
     """获取用户信息"""
-    result = User().getFullInfo()
+    result = getFullInfo()
     return json_res(**result)
-
-
-# @userAPI.route("/getRole", methods=["GET"])
-# def getRoleInfo():
-#     """获取用户权限"""
-#     token = request.headers.get("token")
-#     result = queryRole(token)
-#     return json_res(**result)
-
 
 @userAPI.route("/avatar", methods=["GET"])
 def getUserAvatar():

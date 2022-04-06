@@ -12,7 +12,6 @@ from utils.gen import genUuid
 
 from time import time
 
-
 def loginRequired(fn):
     """
     装饰器函数，用来装饰需要登录之后才可执行的函数，返回用户token给调用他的函数
@@ -22,16 +21,13 @@ def loginRequired(fn):
         # 从HEADER取得TOKEN
         token = request.headers.get("token")
         # 使用token从redis中读取用户ID
-        userId = Redis.read("session_{}".format(token))
+        userId = Redis.read("session/{}".format(token))
         if userId:
-            log("Got user id: {} from token {}".format(userId, token), "debug")
             # 刷新Token有效期
-            Redis.expire("session_{}".format(token))
+            Redis.expire("session/{}".format(token))
             return fn(int(userId), *args, **xargs)
         else:
-            log("User token {} is invaild".format(token), "debug")
             return {"status": 10, "msg": "需要登录"}
-
     return getUserId
 
 
@@ -128,8 +124,8 @@ def registerNewAccount(email, password, nickname):
 
 
 def userLogin(username, password):
-    if username is None or password is None:
-        return {"status": 1, "msg": "接口参数错误！"}
+    if not username or not password:
+        return {"status": 1, "msg": "用户名和密码不可为空"}
     query = (
         t_user.query.with_entities(t_user.id, t_user.password)
         .filter_by(email_addr=username)
@@ -141,13 +137,13 @@ def userLogin(username, password):
         return {"status": 1, "msg": "用户名或密码错误"}
 
     token = genToken(32)
-    Redis.write("session_{}".format(token), query.id)
+    Redis.write("session/{}".format(token), query.id)
     log(
         "User {} Login Successful, UID: {}, gened user token {} return to user.".format(
             username, query.id, token
         )
     )
-    return {"data": {"token": token,"vaild_time":int(round(time()*1000))+172800000}}
+    return {"data": {"token": token,"expTime":int(round(time()*1000))+172800000}}
 
 
 def logoutUser():
