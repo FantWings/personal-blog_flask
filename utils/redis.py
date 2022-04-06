@@ -22,13 +22,10 @@ class Redis(object):
         return r
 
     @classmethod
-    def write(cls, key, value, expire=None):
-        if expire:
-            expire_in_seconds = expire
-        else:
-            expire_in_seconds = current_app.config["REDIS_SESSION_TIMELIFE"]
+    def write(cls, key, value=None, expire=None):
         r = cls._get_r()
-        r.set(key, value, ex=expire_in_seconds)
+        expire_in_seconds = int(current_app.config["REDIS_SESSION_TIMELIFE"])
+        r.set(key, value, ex=expire or expire_in_seconds)
 
     @classmethod
     def read(cls, key):
@@ -70,9 +67,6 @@ class Redis(object):
 
     @classmethod
     def expire(cls, name, expire=None):
-        if expire:
-            expire_in_seconds = expire
-        else:
-            expire_in_seconds = current_app.config["REDIS_SESSION_TIMELIFE"]
         r = cls._get_r()
-        r.expire(name, expire_in_seconds)
+        expire_in_seconds = int(current_app.config["REDIS_SESSION_TIMELIFE"])
+        r.expire(name, expire or expire_in_seconds)
