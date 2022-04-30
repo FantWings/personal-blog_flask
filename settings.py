@@ -52,6 +52,7 @@ class FlaskConfig(object):
 
     # sqlalchemy配置
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_POOL_RECYCLE = 1800
     SQLALCHEMY_ECHO = False
     JSON_AS_ASCII = False
 
