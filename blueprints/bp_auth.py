@@ -1,12 +1,9 @@
-from flask import request
-from . import authAPI
+from flask import request,Blueprint
 from utils.log import log
-
 from utils.response import json_res
 from crud.auth import *
 
-log("Loaded AuthAPI. [Ver 1.2]")
-
+authAPI = Blueprint("auth", __name__, url_prefix="/auth")
 
 @authAPI.route("/register", methods=["POST"])
 def register():

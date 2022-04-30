@@ -1,12 +1,10 @@
-from flask import request
-from . import archiveAPI
-from utils.log import log
-
+from flask import request, Blueprint
 from utils.response import json_res
-from crud.archives import *
-from crud.comment import *
+from crud.archives import (queryArchiveList, addArchive, queryArchive,
+                           deleteArchive)
+from crud.comment import addComment, queryComment, deleteComment
 
-log("Loaded ArchiveAPI [Ver 1.1]")
+archiveAPI = Blueprint("archive", __name__, url_prefix="archive")
 
 
 @archiveAPI.route("/getList", methods=["GET"])

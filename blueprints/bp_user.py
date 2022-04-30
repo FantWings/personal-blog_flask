@@ -1,8 +1,8 @@
-from flask import request
-from . import userAPI
+from flask import request,Blueprint
 from utils.response import json_res
 from crud.user import *
 
+userAPI = Blueprint("user", __name__, url_prefix="/user")
 
 @userAPI.route("/userInfo", methods=["GET"])
 def getUserInfo():

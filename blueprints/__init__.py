@@ -1,8 +1,9 @@
 from flask import Blueprint
+from .bp_archives import archiveAPI
+from .bp_auth import authAPI
+from .bp_user import userAPI
 
-checkAPI = Blueprint("statusCheck", __name__, url_prefix="/v1/api")
-archiveAPI = Blueprint("archive", __name__, url_prefix="/api/v1/archive")
-authAPI = Blueprint("auth", __name__, url_prefix="/api/v1/auth")
-userAPI = Blueprint("user", __name__, url_prefix="/api/v1/user")
-
-from . import bp_check, bp_archives, bp_auth, bp_user
+api_v1 = Blueprint('api_v1', __name__, url_prefix="/api/v1")
+api_v1.register_blueprint(archiveAPI)
+api_v1.register_blueprint(authAPI)
+api_v1.register_blueprint(userAPI)

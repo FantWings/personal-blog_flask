@@ -2,22 +2,24 @@ from flask import Flask
 from flask_cors import CORS
 from settings import FlaskConfig
 from sql import db
-import blueprints
+from blueprints import api_v1
 
 
-app = Flask(__name__)
-app.config.from_object(FlaskConfig)
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(FlaskConfig)
+    CORS(app, supports_credentials=True)
 
-with app.app_context():
-    db.init_app(app)
-    db.create_all()
+    app.register_blueprint(blueprint=api_v1)
 
-app.register_blueprint(blueprint=blueprints.checkAPI)
-app.register_blueprint(blueprint=blueprints.archiveAPI)
-app.register_blueprint(blueprint=blueprints.authAPI)
-app.register_blueprint(blueprint=blueprints.userAPI)
+    with app.app_context():
+        db.init_app(app)
+        db.create_all()
 
-CORS(app, supports_credentials=True)
+    return app
+
+
+app = create_app()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=9090)
