@@ -33,7 +33,6 @@ def register():
 #     else:
 #         return json_res(msg="接口参数错误！", status=1)
 
-
 # @authAPI.route("/2fa/bound", methods=["POST"])
 # def bound2fa():
 #     token = request.headers.get("token", default=0)

@@ -1,8 +1,7 @@
 # 时间戳转换函数
 def toTimeStamp(format_time):
-    import time
-
-    timeStamp = int(time.mktime(format_time.timetuple())) * 1000
+    from time import mktime
+    timeStamp = int(mktime(format_time.timetuple())) * 1000
     return timeStamp
 
 

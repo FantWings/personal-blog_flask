@@ -1,7 +1,4 @@
 from flask import Blueprint
-from utils.log import log
-
-log("Loaded Blueprint Library. [ver1.0]")
 
 checkAPI = Blueprint("statusCheck", __name__, url_prefix="/v1/api")
 archiveAPI = Blueprint("archive", __name__, url_prefix="/api/v1/archive")

@@ -20,9 +20,10 @@ class t_user(db.Model):
     qq = db.Column(db.String(13), comment="QQ号")
     is_admin = db.Column(db.Integer, nullable=False, default=0, comment="权限等级")
     deleted = db.Column(db.Integer, nullable=False, default=0, comment="注销标志")
-    create_time = db.Column(
-        db.DateTime, nullable=False, server_default=func.now(), comment="创建时间"
-    )
+    create_time = db.Column(db.DateTime,
+                            nullable=False,
+                            server_default=func.now(),
+                            comment="创建时间")
     update_time = db.Column(
         db.DateTime,
         nullable=False,
@@ -31,7 +32,8 @@ class t_user(db.Model):
         onupdate=func.now(),
     )
     # 邮箱（外键）
-    email_addr = db.Column(
-        db.String(32), db.ForeignKey("t_email.email"), nullable=False, comment="邮箱"
-    )
+    email_addr = db.Column(db.String(32),
+                           db.ForeignKey("t_email.email"),
+                           nullable=False,
+                           comment="邮箱")
     email = db.relationship("t_email", backref="email_of_user")

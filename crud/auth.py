@@ -12,6 +12,7 @@ from utils.gen import genUuid
 
 from time import time
 
+
 def loginRequired(fn):
     """
     装饰器函数，用来装饰需要登录之后才可执行的函数，返回用户token给调用他的函数
@@ -28,6 +29,7 @@ def loginRequired(fn):
             return fn(int(userId), *args, **xargs)
         else:
             return {"status": 10, "msg": "需要登录"}
+
     return getUserId
 
 
@@ -53,23 +55,16 @@ def registerNewAccount(email, password, nickname):
         nickname=nickname,
         email_addr=email,
         avatar="https://cn.gravatar.com/avatar/{}".format(
-            md5(email.encode("utf-8")).hexdigest()
-        ),
+            md5(email.encode("utf-8")).hexdigest()),
         uuid=genUuid(),
     )
-    log(
-        "User {} registed a account, email: {}, pwd: {}".format(
-            nickname, email, password
-        )
-    )
+    log("User {} registed a account, email: {}, pwd: {}".format(
+        nickname, email, password))
     db.session.add(addUser)
     db.session.commit()
 
-    query = (
-        t_user.query.with_entities(t_user.id)
-        .filter_by(email_addr=email, deleted=0)
-        .first()
-    )
+    query = (t_user.query.with_entities(t_user.id).filter_by(
+        email_addr=email, deleted=0).first())
     token = genToken(32)
     Redis.write("session_{}".format(token), query.id)
     log("Autologged in this new user, token: {}".format(token))
@@ -99,7 +94,6 @@ def registerNewAccount(email, password, nickname):
 #     )
 #     return {"msg": "验证码已发送"}
 
-
 # @loginRequired
 # def add2FAToAccount(uid, verifyCode):
 #     query = t_user.query.filter_by(id=uid).first()
@@ -126,11 +120,8 @@ def registerNewAccount(email, password, nickname):
 def userLogin(username, password):
     if not username or not password:
         return {"status": 1, "msg": "用户名和密码不可为空"}
-    query = (
-        t_user.query.with_entities(t_user.id, t_user.password)
-        .filter_by(email_addr=username)
-        .first()
-    )
+    query = (t_user.query.with_entities(
+        t_user.id, t_user.password).filter_by(email_addr=username).first())
     if query is None:
         return {"status": 1, "msg": "用户名或密码错误"}
     if genMd5Password(password) != query.password:
@@ -138,12 +129,14 @@ def userLogin(username, password):
 
     token = genToken(32)
     Redis.write("session/{}".format(token), query.id)
-    log(
-        "User {} Login Successful, UID: {}, gened user token {} return to user.".format(
-            username, query.id, token
-        )
-    )
-    return {"data": {"token": token,"expTime":int(round(time()*1000))+172800000}}
+    log("User {} Login Successful, UID: {}, gened user token {} return to user."
+        .format(username, query.id, token))
+    return {
+        "data": {
+            "token": token,
+            "expTime": int(round(time() * 1000)) + 172800000
+        }
+    }
 
 
 def logoutUser():
