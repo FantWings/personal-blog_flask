@@ -7,14 +7,14 @@ from . import Model
 class t_user(Model):
     __tablename__ = "t_user"
     id = Column(Integer, primary_key=True, nullable=False, comment="索引")
-    nickname = Column(String(16), nullable=False, comment="用户名")
+    username = Column(String(16), nullable=False, comment="用户名")
+    nickname = Column(String(32), nullable=False, comment="昵称")
     uuid = Column(String(64), nullable=False, comment="用户UUID")
     avatar = Column(String(256), comment="头像")
     password = Column(String(32), comment="密码")
     phone = Column(
         String(11),
-        # 手机号验证功能没做完，暂时注释必填字段
-        # nullable=False,
+        nullable=False,
         comment="手机号",
         unique=True,
     )
@@ -35,5 +35,6 @@ class t_user(Model):
     # 邮箱（外键）
     email_addr = Column(String(32),
                         ForeignKey("t_email.email"),
-                        nullable=False,
+                        nullable=True,
                         comment="邮箱")
+

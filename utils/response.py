@@ -1,12 +1,21 @@
+from time import time
 from flask import make_response
 
 
-def json_res(data=None, msg=None, status=0, code=200):
+def json_response(data=None,
+                  msg: str = None,
+                  status: int = 0,
+                  code: int = 200) -> dict:
     """
-    返回数据处理函数
-    data:           回调数据（Json）
-    msg:            附加消息（字符串）
-    status:           返回码（数值）
+    接口统一函数
+    data:   回调数据
+    msg:    附加消息
+    status: 返回码
     """
-    response = {"status": status, "msg": msg, "data": data}
+    response = {
+        "status": status,
+        "msg": msg,
+        "data": data,
+        "timestep": int(round(time() * 1000))
+    }
     return make_response(response, code)

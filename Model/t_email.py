@@ -6,7 +6,8 @@ from . import Model
 
 class t_email(Model):
     __tablename__ = "t_email"
-    email = Column(String(32), primary_key=True, nullable=False, comment="邮箱")
+    id = Column(Integer, primary_key=True, nullable=False, comment="索引")
+    email = Column(String(32), nullable=False, comment="邮箱")
     verifyed = Column(Integer, nullable=False, default=0, comment="邮箱已验证")
     create_time = Column(DateTime,
                          nullable=False,

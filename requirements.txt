@@ -4,3 +4,4 @@ flask_sqlalchemy
 redis
 mysqlclient
 gunicorn
+tencentcloud-sdk-python

@@ -4,7 +4,6 @@ from sqlalchemy.sql import functions
 from sqlalchemy.orm import relationship
 from . import Model
 
-
 class t_archive(Model):
     __tablename__ = "t_archive"
     id = Column(Integer, primary_key=True, comment="文档号")
@@ -12,10 +11,7 @@ class t_archive(Model):
     content = Column(Text, nullable=False, comment="正文")
     views = Column(Integer, nullable=False, default=0, comment="阅读数")
     cover_image = Column(String(256), nullable=True, comment="封面图")
-    time_for_read = Column(SmallInteger,
-                           nullable=False,
-                           default=5,
-                           comment="所需阅读时间")
+    time_for_read = Column(SmallInteger,nullable=False,default=5,comment="所需阅读时间")
     create_time = Column(DateTime,
                          nullable=False,
                          default=functions.now(),

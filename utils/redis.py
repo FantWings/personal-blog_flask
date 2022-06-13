@@ -1,6 +1,5 @@
 import redis
-from flask import current_app
-from utils.log import log
+from os import getenv
 
 ###################################################
 #           Redis SDK For Python Flask            #
@@ -9,22 +8,19 @@ from utils.log import log
 ###################################################
 
 
-log("Loaded Redis Library [Ver 1.2]")
-
-
 class Redis(object):
     @staticmethod
     def _get_r():
-        host = current_app.config["REDIS_HOST"]
-        port = current_app.config["REDIS_PORT"]
-        db = current_app.config["REDIS_DB"]
+        host = getenv("REDIS_HOST", "127.0.0.1")
+        port = getenv("REDIS_PORT", "6379")
+        db = getenv("REDIS_DB", "1")
         r = redis.StrictRedis(host, port, db)
         return r
 
     @classmethod
     def write(cls, key, value=None, expire=None):
         r = cls._get_r()
-        expire_in_seconds = int(current_app.config["REDIS_SESSION_TIMELIFE"])
+        expire_in_seconds = int(getenv("REDIS_SESSION_TIMELIFE", 3600))
         r.set(key, value, ex=expire or expire_in_seconds)
 
     @classmethod
@@ -68,5 +64,5 @@ class Redis(object):
     @classmethod
     def expire(cls, name, expire=None):
         r = cls._get_r()
-        expire_in_seconds = int(current_app.config["REDIS_SESSION_TIMELIFE"])
+        expire_in_seconds = int(getenv("REDIS_SESSION_TIMELIFE", 3600))
         r.expire(name, expire or expire_in_seconds)

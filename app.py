@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from settings import FlaskConfig
-from sql import db
+from Model import db
 from blueprints import api_v1
 
 
@@ -17,7 +17,6 @@ def create_app():
         db.create_all()
 
     return app
-
 
 app = create_app()
 
